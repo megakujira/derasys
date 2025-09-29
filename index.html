@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>接続テスト</title>
 </head>
 <body>
     <h1>TEST DeraSys</h1>
+    <button onclick="callGAS()">データ取得</button>
+    <pre id="output"></pre>
+    <script>
+        async function callGAS() {
+            const GAS_URL ="https://script.google.com/macros/s/AKfycby68OeV16mkemI0fGLSKEU8zzC3IvoFUja5U4jOeYaHkCooXhbg0YUzHUNJ3gkCHFzj1w/exec";
+
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: "GET"
+                });
+                const json = await response.json();
+                console.log(json);
+                document.getElementById("output").textContent = json.stringify(json, null, 2);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("output").textContent = "エラー:" + err;
+            }
+        }
+    </script>
 </body>
 </html>
