@@ -1,0 +1,128 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  margin-top: 20px;
+}
+
+fieldset {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+legend {
+  padding: 0 8px;
+  font-weight: bold;
+}
+
+select, textarea, input[type="text"], input[type="radio"] {
+  margin: 8px 0;
+}
+
+textarea {
+  width: 100%;
+  height: 80px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 8px;
+  resize: vertical;
+}
+
+.add-btn {
+  display: block;
+  margin: 10px auto;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.add-btn:hover {
+  background: #ddd;
+}
+
+/* カレンダー全体 */
+.calendar {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#month-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+#calendar-body {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+#calendar-body th,
+#calendar-body td {
+  width: 14.2%;
+  height: 60px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* 曜日ヘッダー */
+#calendar-body th {
+  background: #f0f0f0;
+  color: #555;
+}
+
+/* 通常セル */
+#calendar-body td {
+  background: #fff;
+}
+
+/* 選択状態 */
+#calendar-body td.selected {
+  background: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+/* 送信ボタン */
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.submit-btn:hover {
+  background: #45a049;
+}
