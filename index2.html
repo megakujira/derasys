@@ -148,7 +148,9 @@
     </div>
 
     <script>
-        let currentYear, currentMonth;
+        // 選択された日付を保存する変数
+        let selectedDate = null;      // 日にち (例: 15)
+        let currentYear, currentMonth; // 年と月
 
         // ページ読み込み時にカレンダーを生成
         window.addEventListener('DOMContentLoaded', function() {
@@ -208,7 +210,10 @@
                 
                 // 11. 各日付のクリックイベント
                 dayElement.addEventListener('click', function() {
-                    // 選択状態を更新
+                    // 選択された日付を変数に保存
+                    selectedDate = day;
+                    
+                    // 選択状態を更新（視覚的なフィードバック）
                     document.querySelectorAll('.calendar-day').forEach(d => {
                         d.classList.remove('selected');
                     });
@@ -224,6 +229,13 @@
                     const dateElement = document.getElementById('selected-date');
                     dateElement.textContent = `${currentMonth + 1}月${day}日 (${weekday})`;
                     infoElement.classList.add('active');
+                    
+                    // デバッグ用：コンソールに選択した日付を表示
+                    console.log('選択された日付:', {
+                        year: currentYear,
+                        month: currentMonth + 1,
+                        day: selectedDate
+                    });
                 });
                 
                 grid.appendChild(dayElement);
