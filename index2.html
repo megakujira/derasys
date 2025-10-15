@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRSS-01 カレンダー</title>
     <style>
+        /* ====== リセット ====== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* ====== 全体レイアウト ====== */
         body {
             font-family: 'Segoe UI', Meiryo, sans-serif;
             background: #f5f5f5;
@@ -26,19 +28,23 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        /* ====== タイトル ====== */
         h1 {
             font-size: 32px;
             margin-bottom: 40px;
             color: #333;
             font-weight: 300;
             letter-spacing: 2px;
+            text-align: center;
         }
 
+        /* ====== カレンダー ヘッダー ====== */
         .calendar-header {
             background: #f8f8f8;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 4px;
+            text-align: center;
         }
 
         .calendar-header h2 {
@@ -47,14 +53,12 @@
             margin-bottom: 10px;
         }
 
-        .name-display {
-            color: #333;
-            font-size: 16px;
-        }
-
+        /* ====== カレンダー本体 ====== */
         .calendar {
             border: 1px solid #ddd;
             padding: 20px;
+            border-radius: 6px;
+            background: #fff;
         }
 
         .calendar-grid {
@@ -64,6 +68,7 @@
             margin-top: 15px;
         }
 
+        /* 曜日ヘッダー */
         .calendar-day-header {
             text-align: center;
             font-weight: bold;
@@ -72,6 +77,7 @@
             font-size: 14px;
         }
 
+        /* 日付セル */
         .calendar-day {
             aspect-ratio: 1;
             border: 1px solid #ddd;
@@ -82,6 +88,7 @@
             transition: all 0.2s;
             font-size: 16px;
             background: white;
+            border-radius: 4px;
         }
 
         .calendar-day:hover {
@@ -96,6 +103,7 @@
             font-weight: bold;
         }
 
+        /* 空白セル */
         .calendar-day.empty {
             border: none;
             cursor: default;
@@ -105,33 +113,29 @@
             background: white;
         }
 
-        .selected-info {
+        /* ====== フッター情報 ====== */
+        .footer-info {
             margin-top: 20px;
-            padding: 15px;
-            background: #e3f2fd;
-            border-radius: 4px;
             text-align: center;
-            font-size: 16px;
-            color: #1976d2;
-            display: none;
-        }
-
-        .selected-info.active {
-            display: block;
+            font-size: 14px;
+            color: #999;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>画面遷移</h1>
+        <!-- タイトル -->
+        <h1>シフト希望提出</h1>
         
+        <!-- カレンダー ヘッダー -->
         <div class="calendar-header">
             <h2 id="calendar-title">○月シフト出勤希望提出</h2>
-            <div class="name-display">①氏名:〇〇〇〇</div>
         </div>
 
+        <!-- カレンダー本体 -->
         <div class="calendar">
             <div class="calendar-grid" id="calendar-grid">
+                <!-- 曜日ヘッダー -->
                 <div class="calendar-day-header">日</div>
                 <div class="calendar-day-header">月</div>
                 <div class="calendar-day-header">火</div>
@@ -142,102 +146,76 @@
             </div>
         </div>
 
-        <div id="selected-info" class="selected-info">
-            選択した日付: <span id="selected-date"></span>
+        <!-- フッター -->
+        <div class="footer-info">
+            日付をクリックすると、時間帯入力画面に移動します。
         </div>
     </div>
 
     <script>
-        // 選択された日付を保存する変数
-        let selectedDate = null;      // 日にち (例: 15)
-        let currentYear, currentMonth; // 年と月
+        // ====== グローバル変数 ======
+        let currentYear, currentMonth;
 
-        // ページ読み込み時にカレンダーを生成
+        // ページ読み込み時にカレンダー生成
         window.addEventListener('DOMContentLoaded', function() {
             generateNextMonthCalendar();
         });
 
-        // 次の月のカレンダーを生成
+        // ====== 次の月のカレンダーを生成 ======
         function generateNextMonthCalendar() {
-            // 1. 今日の日付を取得
             const today = new Date();
             currentYear = today.getFullYear();
             currentMonth = today.getMonth() + 1; // 次の月
-            
-            // 2. 12月を超えたら翌年の1月にする
+
+            // 12月を超えたら翌年の1月にする
             if (currentMonth > 11) {
                 currentMonth = 0;
                 currentYear++;
             }
 
-            // 3. カレンダーのタイトルを更新
-            document.getElementById('calendar-title').textContent = 
-                `${currentMonth + 1}月シフト出勤希望提出`;
+            // カレンダータイトル更新
+            document.getElementById('calendar-title').textContent = `${currentMonth + 1}月シフト出勤希望提出`;
 
-            // 4. その月の1日を取得
+            // 月初と曜日計算
             const firstDay = new Date(currentYear, currentMonth, 1);
-            
-            // 5. 1日が何曜日か（0=日曜、6=土曜）
             const startDayOfWeek = firstDay.getDay();
-            
-            // 6. その月が何日まであるか
-            // 次の月の0日 = 今月の最終日のテクニック
+
+            // 月末の日付
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const daysInMonth = lastDay.getDate();
 
-            // 7. カレンダーグリッドを取得
+            // カレンダーグリッド取得
             const grid = document.getElementById('calendar-grid');
-            
-            // 8. 曜日ヘッダー以外の既存要素をクリア
+
+            // 既存の日付セルをクリア（曜日ヘッダー以外）
             while (grid.children.length > 7) {
                 grid.removeChild(grid.lastChild);
             }
 
-            // 9. 月初前の空白マスを追加
-            // 例: 1日が水曜日なら、日・月・火の3マス分空白
+            // 空白セル追加
             for (let i = 0; i < startDayOfWeek; i++) {
                 const emptyDay = document.createElement('div');
                 emptyDay.className = 'calendar-day empty';
                 grid.appendChild(emptyDay);
             }
 
-            // 10. 日付マスを追加
+            // 日付セル追加
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayElement = document.createElement('div');
                 dayElement.className = 'calendar-day';
                 dayElement.textContent = day;
-                dayElement.dataset.day = day;
-                
-                // 11. 各日付のクリックイベント
+
+                // クリックイベント
                 dayElement.addEventListener('click', function() {
-                    // 選択された日付を変数に保存
-                    selectedDate = day;
-                    
-                    // 選択状態を更新（視覚的なフィードバック）
-                    document.querySelectorAll('.calendar-day').forEach(d => {
-                        d.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    
-                    // 曜日を計算
                     const clickedDate = new Date(currentYear, currentMonth, day);
                     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
                     const weekday = weekdays[clickedDate.getDay()];
-                    
-                    // 選択した日付を表示
-                    const infoElement = document.getElementById('selected-info');
-                    const dateElement = document.getElementById('selected-date');
-                    dateElement.textContent = `${currentMonth + 1}月${day}日 (${weekday})`;
-                    infoElement.classList.add('active');
-                    
-                    // デバッグ用：コンソールに選択した日付を表示
-                    console.log('選択された日付:', {
-                        year: currentYear,
-                        month: currentMonth + 1,
-                        day: selectedDate
-                    });
+
+                    // ✅ add_shift.html に遷移（URLパラメータで日付を渡す）
+                    const url = `add_shift.html?year=${currentYear}&month=${currentMonth + 1}&day=${day}&weekday=${weekday}`;
+                    window.location.href = url;
                 });
-                
+
                 grid.appendChild(dayElement);
             }
         }
