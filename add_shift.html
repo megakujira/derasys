@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>時間帯フォーム 完全版</title>
+<style>
+  body {
+    font-family: sans-serif;
+    max-width: 400px;
+    margin: 20px auto;
+    background: #fafafa;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 18px;
+  }
+  .time-block {
+    border: 2px solid #ccc;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background: #fff;
+    position: relative;
+  }
+  .time-block:nth-of-type(odd) {
+    border-left: 6px solid pink;
+  }
+  .time-block:nth-of-type(even) {
+    border-left: 6px solid lightgreen;
+  }
+  .radio-group {
+    margin-bottom: 10px;
+  }
+  .radio-group label {
+    margin-right: 10px;
+  }
+  .select-box, .input-box {
+    margin-bottom: 10px;
+  }
+  select, input[type="text"], textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .add-btn {
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin: 15px auto;
+    font-size: 24px;
+    text-align: center;
+    line-height: 40px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+  .note {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: #fff;
+    border-radius: 6px;
+  }
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .hidden {
+    display: none;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #f66;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">-- 月 -- 日 (--)</div>
+
+<!-- コンテナ -->
+<div id="timeContainer">
+  <!-- 初期の時間帯1 -->
+  <div class="time-block">
+    <button class="remove-btn hidden">削除</button>
+    <div class="radio-group">
+      <label><input type="radio" name="type1" value="split" checked> 区分け</label>
+      <label><input type="radio" name="type1" value="custom"> カスタム</label>
+    </div>
+    <div class="select-box">
+      <label>時間区分けタイプ</label>
+      <select>
+        <option>タイプを選択してください</option>
+        <option>A : 07:00~16:00</option>
+        <option>B : 08:00~17:00</option>
+        <option>C : 09:00~18:00</option>
+        <option>D : 10:30~19:30</option>
+      </select>
+    </div>
+    <div class="input-box hidden">
+      <label>開始時刻</label>
+      <input type="text" placeholder="HH:MM">
+      <label>終了時刻</label>
+      <input type="text" placeholder="HH:MM">
+    </div>
+  </div>
+</div>
+
+<!-- ＋ボタン -->
+<div class="add-btn" id="addBtn">+</div>
+
+<!-- 備考欄 -->
+<div class="note">
+  <label>備考欄</label>
+  <textarea rows="3">Value</textarea>
+</div>
+
+<!-- 送信ボタン -->
+<button class="submit-btn">送信</button>
+
+<script>
+  const container = document.getElementById('timeContainer');
+  const addBtn = document.getElementById('addBtn');
+
+  // ラジオ切り替え処理
+  function setupRadioEvents(block) {
+    const radios = block.querySelectorAll('input[type="radio"]');
+    const selectBox = block.querySelector('.select-box');
+    const inputBox = block.querySelector('.input-box');
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'custom') {
+          selectBox.classList.add('hidden');
+          inputBox.classList.remove('hidden');
+        } else {
+          selectBox.classList.remove('hidden');
+          inputBox.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // 削除ボタン処理
+  function setupRemoveButton(block) {
+    const removeBtn = block.querySelector('.remove-btn');
+    removeBtn.addEventListener('click', () => {
+      block.remove();
+    });
+  }
+
+  // 初期ブロックにイベント設定
+  setupRadioEvents(container.querySelector('.time-block'));
+
+  // ＋ボタンで新しい時間帯追加
+  addBtn.addEventListener('click', () => {
+    const count = container.querySelectorAll('.time-block').length + 1;
+    const newBlock = document.createElement('div');
+    newBlock.className = 'time-block';
+    newBlock.innerHTML = `
+      <button class="remove-btn">削除</button>
+      <div class="radio-group">
+        <label><input type="radio" name="type${count}" value="split" checked> 区分け</label>
+        <label><input type="radio" name="type${count}" value="custom"> カスタム</label>
+      </div>
+      <div class="select-box">
+        <label>時間区分けタイプ</label>
+        <select>
+          <option>タイプを選択してください</option>
+          <option>A : 07:00~16:00</option>
+          <option>B : 08:00~17:00</option>
+          <option>C : 09:00~18:00</option>
+          <option>D : 10:30~19:30</option>
+        </select>
+      </div>
+      <div class="input-box hidden">
+        <label>開始時刻</label>
+        <input type="text" placeholder="HH:MM">
+        <label>終了時刻</label>
+        <input type="text" placeholder="HH:MM">
+      </div>
+    `;
+    container.appendChild(newBlock);
+    setupRadioEvents(newBlock);
+    setupRemoveButton(newBlock);
+  });
+</script>
+
+</body>
+</html>
