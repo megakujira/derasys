@@ -4,18 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>でらしふ</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div>
-        <h1 id="mounth">〇月シフト出勤希望提出</h1>
+    <div class="container">
+        <h1>〇月シフト出勤希望提出</h1>
         <h2>氏名：〇〇〇〇</h2>
-    </div>
-    <div>
-        <p>時間帯1</p>
-        <select>
-            <input type="radio">
-        </select>
+
+    
+        <div id="timeContainer">
+        <!-- 初期の時間帯1 -->
+            <div class="time-block">
+                <button class="remove-btn hidden">削除</button>
+                <div class="block-title">時間帯 1</div>
+                <div class="radio-group">
+                    <label><input type="radio" name="type1" value="split" checked> 区分け</label>
+                    <label><input type="radio" name="type1" value="custom"> カスタム</label>
+                </div>
+                <div class="select-box">
+                    <label>時間区分けタイプ</label>
+                    <select>
+                        <option>A : 07:00~16:00</option>
+                        <option>B : 08:00~17:00</option>
+                        <option>C : 09:00~18:00</option>
+                        <option>D : 10:30~19:30</option>
+                    </select>
+                </div>
+                <div class="input-box hidden">
+                    <input type="text" placeholder="HH:MM">
+                    <input type="text" placeholder="HH:MM">
+                </div>
+            </div>
+        </div>
+
+        <button class="add-btn" id="addBtn">+</button>
+
+        
+        <div class="calendar">
+            <h2 id="month-title"></h2>
+            <table id="calendar-body"></table>
+        </div>
+        
+        <div id="">
+        <legend>備考欄</legend>
+        <textarea placeholder="内容を入力してください"></textarea>
+        </div>  
+
+        <input type="submit" class="submit-btn"value="送信する">
+    
     </div>
 
+
+
+  <script>
+        const container = document.getElementById('timeContainer');
+        const addBtn = document.getElementById('addBtn');
+
+        function setupRadioEvents(block) {
+            const radios = block.querySelectorAll('input[type="radio"]');
+            const selectBox = block.querySelector('.select-box');
+            const inputBox = block.querySelector('.input-box');
+
+            radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'custom') {
+                selectBox.classList.add('hidden');
+                inputBox.classList.remove('hidden');
+                } else {
+                selectBox.classList.remove('hidden');
+                inputBox.classList.add('hidden');
+                }
+            });
+            });
+        }
+
+        function setupRemoveButton(block) {
+            const removeBtn = block.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => {
+            block.remove();
+            });
+        }
+
+        setupRadioEvents(container.querySelector('.time-block'));
+
+        addBtn.addEventListener('click', () => {
+            const count = container.querySelectorAll('.time-block').length + 1;
+            const newBlock = document.createElement('div');
+            newBlock.className = 'time-block';
+            newBlock.innerHTML = `
+            <button class="remove-btn">削除</button>
+            <div class="block-title">時間帯 ${count}</div>
+            <div class="radio-group">
+                <label><input type="radio" name="type${count}" value="split" checked> 区分け</label>
+                <label><input type="radio" name="type${count}" value="custom"> カスタム</label>
+            </div>
+            <div class="select-box">
+                <label>時間区分けタイプ</label>
+                <select>
+                <option>A : 07:00~16:00</option>
+                <option>B : 08:00~17:00</option>
+                <option>C : 09:00~18:00</option>
+                <option>D : 10:30~19:30</option>
+                </select>
+            </div>
+            <div class="input-box hidden">
+                <input type="text" placeholder="HH:MM">
+                <input type="text" placeholder="HH:MM">
+            </div>
+            `;
+            container.appendChild(newBlock);
+            setupRadioEvents(newBlock);
+            setupRemoveButton(newBlock);
+        });
+
+        const calendarBody = document.getElementById("calendar-body");
+        const monthTitle = document.getElementById("month-title");
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0=1月
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const daysOfWeek = ["日","月","火","水","木","金","土"];
+        monthTitle.textContent = `${month + 1}月`;
+
+        // 曜日ヘッダー
+        let headerRow = "<tr>" + daysOfWeek.map(d => `<th>${d}</th>`).join("") + "</tr>";
+        let html = headerRow + "<tr>";
+
+        // 空白セル
+        for (let i = 0; i < firstDay.getDay(); i++) html += "<td></td>";
+
+        // 日付セル
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const isToday = day === today.getDate();
+        html += `<td class="${isToday ? "selected" : ""}">${day}</td>`;
+        if (date.getDay() === 6 && day !== lastDay.getDate()) html += "</tr><tr>";
+        }
+
+        html += "</tr>";
+        calendarBody.innerHTML = html;
+
+        // クリックで選択状態切替
+        calendarBody.addEventListener("click", e => {
+        if (e.target.tagName === "TD" && e.target.textContent !== "") {
+            document.querySelectorAll("td").forEach(td => td.classList.remove("selected"));
+            e.target.classList.add("selected");
+        }
+        });
+  </script>
 </body>
 </html>
