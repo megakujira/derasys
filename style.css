@@ -68,6 +68,7 @@ textarea {
 .calendar {
   margin-top: 20px;
   text-align: center;
+  border-color: black;
 }
 
 #month-title {
