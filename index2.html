@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRSS-01 カレンダー</title>
+    <style>
+        /* ====== リセット ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ====== 全体レイアウト ====== */
+        body {
+            font-family: 'Segoe UI', Meiryo, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ====== タイトル ====== */
+        h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #333;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        /* ====== カレンダー ヘッダー ====== */
+        .calendar-header {
+            background: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .calendar-header h2 {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* ====== カレンダー本体 ====== */
+        .calendar {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 曜日ヘッダー */
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 日付セル */
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .calendar-day:hover {
+            background: #f0f0f0;
+            border-color: #999;
+        }
+
+        .calendar-day.selected {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+            font-weight: bold;
+        }
+
+        /* 空白セル */
+        .calendar-day.empty {
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            background: white;
+        }
+
+        /* ====== フッター情報 ====== */
+        .footer-info {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- タイトル -->
+        <h1>シフト希望提出</h1>
+        
+        <!-- カレンダー ヘッダー -->
+        <div class="calendar-header">
+            <h2 id="calendar-title">○月シフト出勤希望提出</h2>
+        </div>
+
+        <!-- カレンダー本体 -->
+        <div class="calendar">
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- 曜日ヘッダー -->
+                <div class="calendar-day-header">日</div>
+                <div class="calendar-day-header">月</div>
+                <div class="calendar-day-header">火</div>
+                <div class="calendar-day-header">水</div>
+                <div class="calendar-day-header">木</div>
+                <div class="calendar-day-header">金</div>
+                <div class="calendar-day-header">土</div>
+            </div>
+        </div>
+
+        <!-- フッター -->
+        <div class="footer-info">
+            日付をクリックすると、時間帯入力画面に移動します。
+        </div>
+    </div>
+
+    <script>
+        // ====== グローバル変数 ======
+        let currentYear, currentMonth;
+
+        // ページ読み込み時にカレンダー生成
+        window.addEventListener('DOMContentLoaded', function() {
+            generateNextMonthCalendar();
+        });
+
+        // ====== 次の月のカレンダーを生成 ======
+        function generateNextMonthCalendar() {
+            const today = new Date();
+            currentYear = today.getFullYear();
+            currentMonth = today.getMonth() + 1; // 次の月
+
+            // 12月を超えたら翌年の1月にする
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+
+            // カレンダータイトル更新
+            document.getElementById('calendar-title').textContent = `${currentMonth + 1}月シフト出勤希望提出`;
+
+            // 月初と曜日計算
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const startDayOfWeek = firstDay.getDay();
+
+            // 月末の日付
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            // カレンダーグリッド取得
+            const grid = document.getElementById('calendar-grid');
+
+            // 既存の日付セルをクリア（曜日ヘッダー以外）
+            while (grid.children.length > 7) {
+                grid.removeChild(grid.lastChild);
+            }
+
+            // 空白セル追加
+            for (let i = 0; i < startDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                grid.appendChild(emptyDay);
+            }
+
+            // 日付セル追加
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                // クリックイベント
+                dayElement.addEventListener('click', function() {
+                    const clickedDate = new Date(currentYear, currentMonth, day);
+                    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+                    const weekday = weekdays[clickedDate.getDay()];
+
+                    // ✅ add_shift.html に遷移（URLパラメータで日付を渡す）
+                    const url = `add_shift.html?year=${currentYear}&month=${currentMonth + 1}&day=${day}&weekday=${weekday}`;
+                    window.location.href = url;
+                });
+
+                grid.appendChild(dayElement);
+            }
+        }
+    </script>
+</body>
+</html>

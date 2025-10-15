@@ -116,8 +116,10 @@
 </head>
 <body>
 
-<div class="header">-- 月 -- 日 (--)</div>
+<!-- 日付表示 -->
+<div class="header" id="date-header">-- 月 -- 日 (--)</div>
 
+<!-- 時間帯コンテナ -->
 <div id="timeContainer">
   <!-- 初期の時間帯1 -->
   <div class="time-block">
@@ -143,19 +145,33 @@
   </div>
 </div>
 
+<!-- ＋ボタン -->
 <div class="add-btn" id="addBtn">+</div>
 
+<!-- 備考欄 -->
 <div class="note">
   <label>備考欄</label>
   <textarea rows="3">Value</textarea>
 </div>
 
+<!-- 送信ボタン -->
 <button class="submit-btn">送信</button>
 
 <script>
+  // ====== URLパラメータから日付を取得して表示 ======
+  const params = new URLSearchParams(window.location.search);
+  const year = params.get('year');
+  const month = params.get('month');
+  const day = params.get('day');
+  const weekday = params.get('weekday');
+  if (month && day && weekday) {
+    document.getElementById('date-header').textContent = `-- ${month}月${day}日 (${weekday}) --`;
+  }
+
   const container = document.getElementById('timeContainer');
   const addBtn = document.getElementById('addBtn');
 
+  // ====== ラジオ切り替え処理 ======
   function setupRadioEvents(block) {
     const radios = block.querySelectorAll('input[type="radio"]');
     const selectBox = block.querySelector('.select-box');
@@ -174,6 +190,7 @@
     });
   }
 
+  // ====== 削除ボタン処理 ======
   function setupRemoveButton(block) {
     const removeBtn = block.querySelector('.remove-btn');
     removeBtn.addEventListener('click', () => {
@@ -181,8 +198,10 @@
     });
   }
 
+  // 初期ブロックにイベント設定
   setupRadioEvents(container.querySelector('.time-block'));
 
+  // ====== ＋ボタンで新しい時間帯追加 ======
   addBtn.addEventListener('click', () => {
     const count = container.querySelectorAll('.time-block').length + 1;
     const newBlock = document.createElement('div');
