@@ -50,7 +50,7 @@
         <textarea placeholder="内容を入力してください"></textarea>
         </div>  
 
-        <input type="submit" class="submit-btn"value="送信">
+        <input type="submit" class="submit-btn"value="送信" onclick="sendBtn()">
     
     </div>
 
@@ -154,6 +154,10 @@
             e.target.classList.add("selected");
         }
         });
+
+        function sendBtn() {
+            alert("送信しました。")
+        }
   </script>
 </body>
 </html>
