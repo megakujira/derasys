@@ -23,12 +23,12 @@
                 </div>
                 <div class="select-box">
                     <label>時間区分けタイプ</label>
-                    <select>
-                        <option>タイプを選択してください</option>
-                        <option>A : 07:00~16:00</option>
-                        <option>B : 08:00~17:00</option>
-                        <option>C : 09:00~18:00</option>
-                        <option>D : 10:30~19:30</option>
+                    <select id="timeselect">
+                        <option class="default" value="">タイプを選択してください</option>
+                        <option value="A">A : 07:00~16:00</option>
+                        <option value="B">B : 08:00~17:00</option>
+                        <option value="C">C : 09:00~18:00</option>
+                        <option value="D">D : 10:30~19:30</option>
                     </select>
                 </div>
                 <div class="input-box hidden">
@@ -141,24 +141,55 @@
         for (let day = 1; day <= lastDay.getDate(); day++) {
         const date = new Date(year, month, day);
         const isToday = day === today.getDate();
-        html += `<td class="${isToday ? "selected" : ""}">${day}</td>`;
+        const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        html += `<td data-date="${dateKey}" class="${isToday ? "selected" : ""}">${day}</td>`;
         if (date.getDay() === 6 && day !== lastDay.getDate()) html += "</tr><tr>";
         }
 
         html += "</tr>";
         calendarBody.innerHTML = html;
 
-        // クリックで選択状態切替
+        // 登録データ管理
+        const selectedData = {}; //{"2025-11-01":"B"}
+
+        // 情報登録
+        const timeSelect =document.getElementById("timeselect");
         calendarBody.addEventListener("click", e => {
-        if (e.target.tagName === "TD" && e.target.textContent !== "") {
-            document.querySelectorAll("td").forEach(td => td.classList.remove("selected"));
-            e.target.classList.add("selected");
-        }
+        if (e.target.tagName === "TD" && e.target.textContent === "")return;
+        document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
+        e.target.classList.add("selected");
+        const dateKey = e.target.dataset.date;
+        const currentType = selectedData[dateKey] || "";
+
+        timeSelect.value = currentType;
+        timeSelect.style.left = e.pageX + "px";
+        timeSelect.style.top = e.pageY + "px";
+        timeSelect.style.display = "block";
+        timeSelect.focus();
+
+        timeSelect.onchange = () => {
+            const type =timeSelect.value;
+            if (type === "") {
+                delete selectedData[dateKey];
+                e.target.style.backgroundColor = "";
+            } else {
+                selectedData[dateKey] = type;
+                e.target.style.backgroundColor = "pink";
+            }
+            timeSelect.style.display = "none";
+        };
+        
+        // ほかの場所をクリックしたらメニューを閉じる
+        timeSelect.onblur = () => {
+            timeSelect.style.display = "none";
+        };
+
         });
 
         function sendBtn() {
             alert("送信しました。")
         }
+        
   </script>
 </body>
 </html>
