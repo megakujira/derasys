@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>希望シフト提出フォーム</title>
+    <title>希望休提出フォーム</title>
     <style>
         /* ====== リセット ====== */
         * {
@@ -125,11 +125,11 @@
 <body>
     <div class="container">
         <!-- タイトル -->
-        <h1>シフト希望提出</h1>
+        <h1>希望休提出</h1>
         
         <!-- カレンダー ヘッダー -->
         <div class="calendar-header">
-            <h2 id="calendar-title">○月シフト出勤希望提出</h2>
+            <h2 id="calendar-title">○月希望休提出</h2>
         </div>
 
         <!-- カレンダー本体 -->
@@ -174,7 +174,7 @@
             }
 
             // カレンダータイトル更新
-            document.getElementById('calendar-title').textContent = `${currentMonth + 1}月シフト出勤希望提出`;
+            document.getElementById('calendar-title').textContent = `${currentMonth + 1}月希望休提出`;
 
             // 月初と曜日計算
             const firstDay = new Date(currentYear, currentMonth, 1);
@@ -211,8 +211,8 @@
                     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
                     const weekday = weekdays[clickedDate.getDay()];
 
-                    // ✅ add_shift.html に遷移（URLパラメータで日付を渡す）
-                    const url = `add_shift.html?year=${currentYear}&month=${currentMonth + 1}&day=${day}&weekday=${weekday}`;
+                    // ✅ add_holiday.html に遷移（URLパラメータで日付を渡す）
+                    const url = `add_holiday.html?year=${currentYear}&month=${currentMonth + 1}&day=${day}&weekday=${weekday}`;
                     window.location.href = url;
                 });
 
