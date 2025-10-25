@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>時間帯フォーム シフト</title>
+<title>時間帯フォーム 希望休</title>
 <style>
   body {
     font-family: sans-serif;
@@ -136,7 +136,7 @@
 
 <!-- ヘッダー＋戻るボタン -->
 <div class="header-container">
-  <a href="index2.html" class="back-btn">← 戻る</a>
+  <a href="index3.html" class="back-btn">← 戻る</a>
   <div class="header" id="date-header">-- 月 -- 日 (--)</div>
 </div>
 
@@ -145,6 +145,14 @@
   <div class="time-block">
     <button class="remove-btn hidden">削除</button>
     <div class="block-title">時間帯 1</div>
+
+    <!-- ▼ 追加：有休／公休 選択 -->
+    <div class="radio-group">
+      <label><input type="radio" name="holiday1" value="有休" checked> 有休</label>
+      <label><input type="radio" name="holiday1" value="公休"> 公休</label>
+    </div>
+    <!-- ▲ ここまで追加 -->
+
     <div class="radio-group">
       <label><input type="radio" name="type1" value="split" checked> 区分け</label>
       <label><input type="radio" name="type1" value="custom"> カスタム</label>
@@ -191,7 +199,7 @@
   const addBtn = document.getElementById('addBtn');
 
   function setupRadioEvents(block) {
-    const radios = block.querySelectorAll('input[type="radio"]');
+    const radios = block.querySelectorAll('input[type="radio"][name^="type"]');
     const selectBox = block.querySelector('.select-box');
     const inputBox = block.querySelector('.input-box');
     radios.forEach(radio => {
@@ -223,6 +231,14 @@
     newBlock.innerHTML = `
       <button class="remove-btn">削除</button>
       <div class="block-title">時間帯 ${count}</div>
+
+      <!-- ▼ 追加：有休／公休 選択 -->
+      <div class="radio-group">
+        <label><input type="radio" name="holiday${count}" value="有休" checked> 有休</label>
+        <label><input type="radio" name="holiday${count}" value="公休"> 公休</label>
+      </div>
+      <!-- ▲ ここまで追加 -->
+
       <div class="radio-group">
         <label><input type="radio" name="type${count}" value="split" checked> 区分け</label>
         <label><input type="radio" name="type${count}" value="custom"> カスタム</label>
