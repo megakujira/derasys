@@ -32,8 +32,8 @@
                     </select>
                 </div>
                 <div class="input-box hidden">
-                    <input type="text" placeholder="HH:MM">
-                    <input type="text" placeholder="HH:MM">
+                    <input id="startTime" type="time" placeholder="開始時間">
+                    <input id="endTime" type="time" placeholder="終了時間">
                 </div>
             </div>
         </div>
@@ -102,10 +102,11 @@
             <div class="select-box">
                 <label>時間区分けタイプ</label>
                 <select>
-                <option>A : 07:00~16:00</option>
-                <option>B : 08:00~17:00</option>
-                <option>C : 09:00~18:00</option>
-                <option>D : 10:30~19:30</option>
+                        <option class="default" value="">タイプを選択してください</option>
+                        <option value="A">A : 07:00~16:00</option>
+                        <option value="B">B : 08:00~17:00</option>
+                        <option value="C">C : 09:00~18:00</option>
+                        <option value="D">D : 10:30~19:30</option>
                 </select>
             </div>
             <div class="input-box hidden">
@@ -151,41 +152,125 @@
 
         // 登録データ管理
         const selectedData = {}; //{"2025-11-01":"B"}
+        let selectedDateCell = null;
+
+        const timeSelect1 = document.getElementById("timeselect");
+        const startInput1 = document.getElementById("startTime");
+        const endInput1 = document.getElementById("endTime");
 
         // 情報登録
-        const timeSelect =document.getElementById("timeselect");
-        calendarBody.addEventListener("click", e => {
-        if (e.target.tagName === "TD" && e.target.textContent === "")return;
-        document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
-        e.target.classList.add("selected");
-        const dateKey = e.target.dataset.date;
-        const currentType = selectedData[dateKey] || "";
-
-        timeSelect.value = currentType;
-        timeSelect.style.left = e.pageX + "px";
-        timeSelect.style.top = e.pageY + "px";
-        timeSelect.style.display = "block";
-        timeSelect.focus();
-
-        timeSelect.onchange = () => {
-            const type =timeSelect.value;
-            if (type === "") {
-                delete selectedData[dateKey];
-                e.target.style.backgroundColor = "";
-            } else {
-                selectedData[dateKey] = type;
-                e.target.style.backgroundColor = "pink";
-            }
-            timeSelect.style.display = "none";
-        };
         
-        // ほかの場所をクリックしたらメニューを閉じる
-        timeSelect.onblur = () => {
-            timeSelect.style.display = "none";
-        };
+calendarBody.addEventListener("click", e => {
+  if (e.target.tagName !== "TD" || !e.target.dataset.date) return;
 
-        });
+  // --- 1️⃣ 旧日付を保存 ---
+  if (selectedDateCell) saveDayData(selectedDateCell.dataset.date);
 
+  // --- 2️⃣ 選択状態を変更 ---
+  document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
+  e.target.classList.add("selected");
+  selectedDateCell = e.target;
+
+  // --- 3️⃣ 新しい日付のデータを復元 ---
+  restoreDayData(selectedDateCell.dataset.date);
+});
+
+// --- 日付の情報を保存 ---
+function saveDayData(dateKey) {
+  const blocks = container.querySelectorAll('.time-block');
+  const dayData = [];
+
+  blocks.forEach((block, i) => {
+    const mode = block.querySelector(`input[name="type${i+1}"]:checked`).value;
+    const select = block.querySelector("select");
+    const inputs = block.querySelectorAll('input[type="time"]');
+
+    let entry = { mode };
+    let isValid = false; // 有効データ判定フラグ
+
+    if (mode === "split") {
+      const val = select.value;
+      if (val && val !== "") {
+        entry.value = val;
+        isValid = true;
+      }
+    } else {
+      const start = inputs[0].value;
+      const end = inputs[1].value;
+      if (start && end) {
+        entry.start = start;
+        entry.end = end;
+        isValid = true;
+      }
+    }
+
+    // 有効な場合のみ登録
+    if (isValid) {
+      dayData.push(entry);
+    }
+  });
+
+  // 保存
+  selectedData[dateKey] = dayData;
+
+  // === 背景色更新 ===
+  const cell = document.querySelector(`[data-date="${dateKey}"]`);
+  if (!cell) return;
+
+  if (dayData.length >= 2) {
+    cell.style.background = "linear-gradient(to right, pink 50%, lightgreen 50%)";
+  } else if (dayData.length === 1) {
+    cell.style.background = "pink";
+  } else {
+    cell.style.background = "";
+  }
+
+  console.log(dateKey, dayData);
+}
+
+// --- 日付の情報を復元 ---
+function restoreDayData(dateKey) {
+  const data = selectedData[dateKey] || [];
+
+  // 一旦全削除
+  container.innerHTML = "";
+
+  // データ分だけ生成
+  data.forEach((item, i) => {
+    const newBlock = document.createElement("div");
+    newBlock.className = "time-block";
+    newBlock.innerHTML = `
+      <button class="remove-btn ${i === 0 ? "hidden" : ""}">削除</button>
+      <div class="block-title">時間帯 ${i+1}</div>
+      <div class="radio-group">
+        <label><input type="radio" name="type${i+1}" value="split" ${item.mode === "split" ? "checked" : ""}> 区分け</label>
+        <label><input type="radio" name="type${i+1}" value="custom" ${item.mode === "custom" ? "checked" : ""}> カスタム</label>
+      </div>
+      <div class="select-box ${item.mode === "custom" ? "hidden" : ""}">
+        <label>時間区分けタイプ</label>
+        <select>
+          <option class="default" value="">タイプを選択してください</option>
+          <option value="A" ${item.value==="A"?"selected":""}>A : 07:00~16:00</option>
+          <option value="B" ${item.value==="B"?"selected":""}>B : 08:00~17:00</option>
+          <option value="C" ${item.value==="C"?"selected":""}>C : 09:00~18:00</option>
+          <option value="D" ${item.value==="D"?"selected":""}>D : 10:30~19:30</option>
+        </select>
+      </div>
+      <div class="input-box ${item.mode === "split" ? "hidden" : ""}">
+        <input type="time" value="${item.start || ""}">
+        <input type="time" value="${item.end || ""}">
+      </div>`;
+    container.appendChild(newBlock);
+    setupRadioEvents(newBlock);
+    setupRemoveButton(newBlock);
+  });
+
+  // データがないときは時間帯1を作る
+  if (data.length === 0) {
+    addBtn.click();
+    container.querySelector(".remove-btn").classList.add("hidden");
+  }
+}
         function sendBtn() {
             alert("送信しました。")
         }
