@@ -154,6 +154,13 @@
         const selectedData = {}; //{"2025-11-01":"B"}
         let selectedDateCell = null;
 
+        selectedDateCell = document.querySelector("#calendar-body td.selected");
+
+        // 一番最初にrestoreを呼んで状態同期
+        if (selectedDateCell) {
+          restoreDayData(selectedDateCell.dataset.date);
+        }
+
         const timeSelect1 = document.getElementById("timeselect");
         const startInput1 = document.getElementById("startTime");
         const endInput1 = document.getElementById("endTime");
