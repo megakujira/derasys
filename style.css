@@ -78,6 +78,11 @@ textarea {
     font-weight: bold;
     margin-bottom: 8px;
 }
+.leave-type {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 30px;
+}
 .radio-group {
     margin-bottom: 10px;
     display: flex;
