@@ -1,109 +1,345 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>でらしふ</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 20px 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      form {
+        margin-top: 20px;
+      }
+
+      fieldset {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+      }
+
+      legend {
+        padding: 0 8px;
+        font-weight: bold;
+      }
+
+      select,
+      textarea,
+      input[type="text"],
+      input[type="radio"] {
+        margin: 8px 0;
+      }
+
+      textarea {
+        width: 100%;
+        height: 80px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 8px;
+        resize: vertical;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+      .time-block {
+        border: 2px solid #333;
+        padding: 12px;
+        margin-bottom: 12px;
+        background: #fff;
+        position: relative;
+      }
+      .time-block::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 100%;
+      }
+      .time-block:nth-of-type(1)::before {
+        background: pink;
+      }
+      .time-block:nth-of-type(2)::before {
+        background: lightgreen;
+      }
+      .block-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .leave-type {
+        margin-bottom: 10px;
+        display: flex;
+        gap: 30px;
+      }
+      .radio-group {
+        margin-bottom: 10px;
+        display: flex;
+        gap: 10px;
+      }
+      .select-box,
+      .input-box {
+        margin-bottom: 10px;
+      }
+      select,
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      .input-box {
+        display: flex;
+        gap: 10px;
+      }
+      .input-box input {
+        flex: 1;
+        text-align: center;
+      }
+      .add-btn {
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 15px auto;
+        font-size: 24px;
+        text-align: center;
+        line-height: 40px;
+        border: 1px solid #333;
+        border-radius: 50%;
+        background: #fff;
+        cursor: pointer;
+      }
+      .hidden {
+        display: none;
+      }
+      .remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #f66;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      /* カレンダー全体 */
+      .calendar {
+        margin-top: 20px;
+        text-align: center;
+        border: 2px solid black;
+      }
+
+      #month-title {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      #calendar-body {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      #calendar-body th,
+      #calendar-body td {
+        width: 14.2%;
+        height: 60px;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+
+      /* 曜日ヘッダー */
+      #calendar-body th {
+        background: #f0f0f0;
+        color: #555;
+      }
+
+      /* 通常セル */
+      #calendar-body td {
+        background: #fff;
+      }
+
+      /* 選択状態 */
+      #calendar-body td.selected {
+        background: #8fb4e1;
+        color: white;
+        font-weight: bold;
+      }
+      td.filled {
+        background-color: pink !important;
+      }
+      .remarks {
+        margin-top: 20px;
+        border: 2px solid black;
+        padding: 12px;
+      }
+      option.default {
+        font-weight: bold;
+      }
+      /* 送信ボタン */
+      .submit-btn {
+        margin: 20px auto 0;
+        display: block;
+        width: 100%;
+        max-width: 60px;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background: #e6e6e6;
+        color: black;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .submit-btn:hover {
+        background: #999999;
+      }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <h1>〇月シフト出勤希望休提出</h1>
-        <h2>氏名：〇〇〇〇</h2>
+      <h1>〇月シフト出勤希望休提出</h1>
+      <h2>氏名：〇〇〇〇</h2>
 
-    
-        <div id="timeContainer">
+      <div id="timeContainer">
         <!-- 初期の時間帯1 -->
-            <div class="time-block">
-                <button class="remove-btn hidden">削除</button>
-                <div class="block-title">時間帯 1</div>
-                <!-- 休暇タイプの選択 -->
-                <div class="leave-type">
-                    <label><input type="radio" name="leave-type1" value="公休" checked>公休</label>
-                    <label><input type="radio" name="leave-type1"value="有給">有給</label>
-                </div>
-                <hr>
-                <!-- 時間帯選択 -->
-                <div class="radio-group">
-                    <label><input type="radio" name="type1" value="split" checked> 区分け</label>
-                    <label><input type="radio" name="type1" value="custom"> カスタム</label>
-                </div>
-                <div class="select-box">
-                    <label>時間区分けタイプ</label>
-                    <select id="timeselect">
-                        <option class="default" value="">タイプを選択してください</option>
-                        <option value="A">A : 07:00~16:00</option>
-                        <option value="B">B : 08:00~17:00</option>
-                        <option value="C">C : 09:00~18:00</option>
-                        <option value="D">D : 10:30~19:30</option>
-                    </select>
-                </div>
-                <div class="input-box hidden">
-                    <input id="startTime" type="time" placeholder="開始時間">
-                    <input id="endTime" type="time" placeholder="終了時間">
-                </div>
-            </div>
-        </div>
-
-        <button class="add-btn" id="addBtn">+</button>
-
-        
-        <div class="calendar">
-          <div class="calendar-header">
-            <button id="prevMonth">←</button>
-            <h2 id="month-title"></h2>
-            <button id="nextMonth">→</button>
+        <div class="time-block">
+          <button class="remove-btn hidden">削除</button>
+          <div class="block-title">時間帯 1</div>
+          <!-- 休暇タイプの選択 -->
+          <div class="leave-type">
+            <label
+              ><input
+                type="radio"
+                name="leave-type1"
+                value="公休"
+                checked
+              />公休</label
+            >
+            <label
+              ><input type="radio" name="leave-type1" value="有給" />有給</label
+            >
           </div>
-          <table id="calendar-body"></table>
+          <hr />
+          <!-- 時間帯選択 -->
+          <div class="radio-group">
+            <label
+              ><input type="radio" name="type1" value="split" checked />
+              区分け</label
+            >
+            <label
+              ><input type="radio" name="type1" value="custom" />
+              カスタム</label
+            >
+          </div>
+          <div class="select-box">
+            <label>時間区分けタイプ</label>
+            <select id="timeselect">
+              <option class="default" value="">タイプを選択してください</option>
+              <option value="A">A : 07:00~16:00</option>
+              <option value="B">B : 08:00~17:00</option>
+              <option value="C">C : 09:00~18:00</option>
+              <option value="D">D : 10:30~19:30</option>
+            </select>
+          </div>
+          <div class="input-box hidden">
+            <input id="startTime" type="time" placeholder="開始時間" />
+            <input id="endTime" type="time" placeholder="終了時間" />
+          </div>
         </div>
-        
-        <div class="remarks">
+      </div>
+
+      <button class="add-btn" id="addBtn">+</button>
+
+      <div class="calendar">
+        <div class="calendar-header">
+          <button id="prevMonth">←</button>
+          <h2 id="month-title"></h2>
+          <button id="nextMonth">→</button>
+        </div>
+        <table id="calendar-body"></table>
+      </div>
+
+      <div class="remarks">
         <div class="remarks-title">備考欄</div>
         <textarea placeholder="内容を入力してください"></textarea>
-        </div>  
+      </div>
 
-        <input type="submit" class="submit-btn"value="送信" onclick="sendBtn()">
-    
+      <input
+        type="submit"
+        class="submit-btn"
+        value="送信"
+        onclick="sendBtn()"
+      />
     </div>
 
+    <script>
+      const container = document.getElementById("timeContainer");
+      const addBtn = document.getElementById("addBtn");
 
+      function setupRadioEvents(block) {
+        const radios = block.querySelectorAll('input[type="radio"]');
+        const selectBox = block.querySelector(".select-box");
+        const inputBox = block.querySelector(".input-box");
 
-  <script>
-        const container = document.getElementById('timeContainer');
-        const addBtn = document.getElementById('addBtn');
+        radios.forEach((radio) => {
+          radio.addEventListener("change", () => {
+            if (radio.value === "custom") {
+              selectBox.classList.add("hidden");
+              inputBox.classList.remove("hidden");
+            } else {
+              selectBox.classList.remove("hidden");
+              inputBox.classList.add("hidden");
+            }
+          });
+        });
+      }
 
-        function setupRadioEvents(block) {
-            const radios = block.querySelectorAll('input[type="radio"]');
-            const selectBox = block.querySelector('.select-box');
-            const inputBox = block.querySelector('.input-box');
+      function setupRemoveButton(block) {
+        const removeBtn = block.querySelector(".remove-btn");
+        removeBtn.addEventListener("click", () => {
+          block.remove();
+        });
+      }
 
-            radios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (radio.value === 'custom') {
-                selectBox.classList.add('hidden');
-                inputBox.classList.remove('hidden');
-                } else {
-                selectBox.classList.remove('hidden');
-                inputBox.classList.add('hidden');
-                }
-            });
-            });
-        }
+      setupRadioEvents(container.querySelector(".time-block"));
 
-        function setupRemoveButton(block) {
-            const removeBtn = block.querySelector('.remove-btn');
-            removeBtn.addEventListener('click', () => {
-            block.remove();
-            });
-        }
-
-        setupRadioEvents(container.querySelector('.time-block'));
-
-        addBtn.addEventListener('click', () => {
-            const count = container.querySelectorAll('.time-block').length + 1;
-            const newBlock = document.createElement('div');
-            newBlock.className = 'time-block';
-            newBlock.innerHTML = `
+      addBtn.addEventListener("click", () => {
+        const count = container.querySelectorAll(".time-block").length + 1;
+        const newBlock = document.createElement("div");
+        newBlock.className = "time-block";
+        newBlock.innerHTML = `
             <button class="remove-btn">削除</button>
             <div class="block-title">時間帯 ${count}</div>
             <div class="leave-type">
@@ -130,127 +366,140 @@
                 <input id="endTime" type="time" placeholder="終了時間">
             </div>
             `;
-            container.appendChild(newBlock);
-            setupRadioEvents(newBlock);
-            setupRemoveButton(newBlock);
-        });
-
-    let today = new Date();
-    let currentYear = today.getFullYear();
-    let currentMonth = today.getMonth(); // 0〜11
-    let selectedDateCell = null;
-    let selectedData = {}; // 日付ごとのデータ保存用
-
-    function renderCalendar(year, month) {
-      const calendar = document.getElementById("calendar-body");
-      const monthLabel = document.getElementById("month-title");
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-
-      monthLabel.textContent = `${year}年 ${month + 1}月`;
-
-      let html = "<tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr><tr>";
-
-      for (let i = 0; i < firstDay.getDay(); i++) {
-        html += "<td></td>";
-      }
-
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const date = new Date(year, month, day);
-        const dateStr = `${year}-${month + 1}-${day}`;
-
-        // その日にデータが保存されているかをチェック
-        const isFilled = selectedData[dateStr] && selectedData[dateStr].length > 0;
-
-        // データがある日は「filled」クラスを付ける（ピンク表示用）
-        html += `<td class="${isFilled ? "filled" : ""}" data-date="${dateStr}">${day}</td>`;
-        if (date.getDay() === 6 && day !== lastDay.getDate()) html += "</tr><tr>";
-      }
-
-      html += "</tr>";
-      calendar.innerHTML = html;
-
-      // クリック処理
-      document.querySelectorAll("#calendar td[data-date]").forEach(td => {
-        td.addEventListener("click", () => {
-          if (selectedDateCell) selectedDateCell.classList.remove("selected");
-          td.classList.add("selected");
-          selectedDateCell = td;
-          const clickedDate = td.dataset.date;
-          selectedData[clickedDate] = true;
-          console.log("選択された日付:", clickedDate);
-        });
+        container.appendChild(newBlock);
+        setupRadioEvents(newBlock);
+        setupRemoveButton(newBlock);
       });
-    }
 
-    // ==== ボタンの挙動 ====
-    document.getElementById("prevMonth").addEventListener("click", () => {
-    // 今月より前には戻れないように制限
-    if (currentYear < today.getFullYear() || 
-      (currentYear === today.getFullYear() && currentMonth <= today.getMonth())) {
-      alert("これ以上前の月は表示できません");
-      return;
-    }
+      let today = new Date();
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth(); // 0〜11
+      let selectedDateCell = null;
+      let selectedData = {}; // 日付ごとのデータ保存用
 
-    if (currentMonth === 0) {
-      currentYear--;
-      currentMonth = 11;
-    } else {
-      currentMonth--;
-    }
+      function renderCalendar(year, month) {
+        const calendar = document.getElementById("calendar-body");
+        const monthLabel = document.getElementById("month-title");
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
 
-    renderCalendar(currentYear, currentMonth);
-  });
+        monthLabel.textContent = `${year}年 ${month + 1}月`;
 
-    document.getElementById("nextMonth").addEventListener("click", () => {
-      // 最大2か月先まで（今日の月 +2）
-      const maxMonth = today.getMonth() + 2;
-      const maxYear = today.getFullYear() + (maxMonth > 11 ? 1 : 0);
-      const adjustedMaxMonth = maxMonth % 12;
+        let html =
+          "<tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr><tr>";
 
-      if (currentYear > maxYear || (currentYear === maxYear && currentMonth >= adjustedMaxMonth)) {
-        alert("これ以上先の月は表示できません");
-        return;
-      }
-
-      if (currentMonth === 11) {
-        currentYear++;
-        currentMonth = 0;
-      } else {
-        currentMonth++;
-      }
-      renderCalendar(currentYear, currentMonth);
-    });
-
-    // ==== 初期表示（来月をデフォルト表示したい場合）====
-    currentMonth++; 
-    if (currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-    }
-    renderCalendar(currentYear, currentMonth);
-
-        selectedDateCell = document.querySelector("#calendar-body td.selected");
-
-        // 一番最初にrestoreを呼んで状態同期
-        if (selectedDateCell) {
-          restoreDayData(selectedDateCell.dataset.date);
+        for (let i = 0; i < firstDay.getDay(); i++) {
+          html += "<td></td>";
         }
 
-        const timeSelect1 = document.getElementById("timeselect");
-        const startInput1 = document.getElementById("startTime");
-        const endInput1 = document.getElementById("endTime");
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+          const date = new Date(year, month, day);
+          const dateStr = `${year}-${month + 1}-${day}`;
 
-        // 情報登録
-        const calendarBody = document.getElementById("calendar-body");
-      calendarBody.addEventListener("click", e => {
+          // その日にデータが保存されているかをチェック
+          const isFilled =
+            selectedData[dateStr] && selectedData[dateStr].length > 0;
+
+          // データがある日は「filled」クラスを付ける（ピンク表示用）
+          html += `<td class="${
+            isFilled ? "filled" : ""
+          }" data-date="${dateStr}">${day}</td>`;
+          if (date.getDay() === 6 && day !== lastDay.getDate())
+            html += "</tr><tr>";
+        }
+
+        html += "</tr>";
+        calendar.innerHTML = html;
+
+        // クリック処理
+        document.querySelectorAll("#calendar td[data-date]").forEach((td) => {
+          td.addEventListener("click", () => {
+            if (selectedDateCell) selectedDateCell.classList.remove("selected");
+            td.classList.add("selected");
+            selectedDateCell = td;
+            const clickedDate = td.dataset.date;
+            selectedData[clickedDate] = true;
+            console.log("選択された日付:", clickedDate);
+          });
+        });
+      }
+
+      // ==== ボタンの挙動 ====
+      document.getElementById("prevMonth").addEventListener("click", () => {
+        // 今月より前には戻れないように制限
+        if (
+          currentYear < today.getFullYear() ||
+          (currentYear === today.getFullYear() &&
+            currentMonth <= today.getMonth())
+        ) {
+          alert("これ以上前の月は表示できません");
+          return;
+        }
+
+        if (currentMonth === 0) {
+          currentYear--;
+          currentMonth = 11;
+        } else {
+          currentMonth--;
+        }
+
+        renderCalendar(currentYear, currentMonth);
+      });
+
+      document.getElementById("nextMonth").addEventListener("click", () => {
+        // 最大2か月先まで（今日の月 +2）
+        const maxMonth = today.getMonth() + 2;
+        const maxYear = today.getFullYear() + (maxMonth > 11 ? 1 : 0);
+        const adjustedMaxMonth = maxMonth % 12;
+
+        if (
+          currentYear > maxYear ||
+          (currentYear === maxYear && currentMonth >= adjustedMaxMonth)
+        ) {
+          alert("これ以上先の月は表示できません");
+          return;
+        }
+
+        if (currentMonth === 11) {
+          currentYear++;
+          currentMonth = 0;
+        } else {
+          currentMonth++;
+        }
+        renderCalendar(currentYear, currentMonth);
+      });
+
+      // ==== 初期表示（来月をデフォルト表示したい場合）====
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+
+      selectedDateCell = document.querySelector("#calendar-body td.selected");
+
+      // 一番最初にrestoreを呼んで状態同期
+      if (selectedDateCell) {
+        restoreDayData(selectedDateCell.dataset.date);
+      }
+
+      const timeSelect1 = document.getElementById("timeselect");
+      const startInput1 = document.getElementById("startTime");
+      const endInput1 = document.getElementById("endTime");
+
+      // 情報登録
+      const calendarBody = document.getElementById("calendar-body");
+      calendarBody.addEventListener("click", (e) => {
         if (e.target.tagName !== "TD" || !e.target.dataset.date) return;
 
         // --- 旧日付を保存 ---
         if (selectedDateCell) saveDayData(selectedDateCell.dataset.date);
 
         // --- 選択状態を変更 ---
-        document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
+        document
+          .querySelectorAll("#calendar-body td")
+          .forEach((td) => td.classList.remove("selected"));
         e.target.classList.add("selected");
         selectedDateCell = e.target;
 
@@ -258,162 +507,187 @@
         restoreDayData(selectedDateCell.dataset.date);
       });
 
-// --- 日付の情報を保存 ---
-function saveDayData(dateKey) {
-  const blocks = container.querySelectorAll('.time-block');
-  const dayData = [];
+      // --- 日付の情報を保存 ---
+      function saveDayData(dateKey) {
+        const blocks = container.querySelectorAll(".time-block");
+        const dayData = [];
 
-  blocks.forEach((block, i) => {
-    const mode = block.querySelector(`input[name="type${i+1}"]:checked`).value;
-    const select = block.querySelector("select");
-    const inputs = block.querySelectorAll('input[type="time"]');
-    const leaveType = block.querySelector(`input[name="leave-type${i+1}"]:checked`).value;
+        blocks.forEach((block, i) => {
+          const mode = block.querySelector(
+            `input[name="type${i + 1}"]:checked`
+          ).value;
+          const select = block.querySelector("select");
+          const inputs = block.querySelectorAll('input[type="time"]');
+          const leaveType = block.querySelector(
+            `input[name="leave-type${i + 1}"]:checked`
+          ).value;
 
+          let entry = { mode, leaveType };
+          let isValid = false; // 有効データ判定フラグ
 
-    let entry = { mode, leaveType };
-    let isValid = false; // 有効データ判定フラグ
+          if (mode === "split") {
+            const val = select.value;
+            if (val && val !== "") {
+              entry.value = val;
+              isValid = true;
+            }
+          } else {
+            const start = inputs[0].value;
+            const end = inputs[1].value;
+            if (start && end) {
+              entry.start = start;
+              entry.end = end;
+              isValid = true;
+            }
+          }
 
-    if (mode === "split") {
-      const val = select.value;
-      if (val && val !== "") {
-        entry.value = val;
-        isValid = true;
+          // 有効な場合のみ登録
+          if (isValid) {
+            dayData.push(entry);
+          }
+        });
+
+        // 保存
+        selectedData[dateKey] = dayData;
+
+        // === 背景色更新 ===
+        const cell = document.querySelector(`[data-date="${dateKey}"]`);
+        if (!cell) return;
+
+        if (dayData.length >= 2) {
+          cell.style.background =
+            "linear-gradient(to right, pink 50%, lightgreen 50%)";
+        } else if (dayData.length === 1) {
+          cell.style.background = "pink";
+        } else {
+          cell.style.background = "";
+        }
+
+        console.log(dateKey, dayData);
       }
-    } else {
-      const start = inputs[0].value;
-      const end = inputs[1].value;
-      if (start && end) {
-        entry.start = start;
-        entry.end = end;
-        isValid = true;
-      }
-    }
 
-    
-    // 有効な場合のみ登録
-    if (isValid) {
-      dayData.push(entry);
-    }
-  });
+      // --- 日付の情報を復元 ---
+      function restoreDayData(dateKey) {
+        const data = selectedData[dateKey] || [];
 
-  // 保存
-  selectedData[dateKey] = dayData;
+        // 一旦全削除
+        container.innerHTML = "";
 
-  // === 背景色更新 ===
-  const cell = document.querySelector(`[data-date="${dateKey}"]`);
-  if (!cell) return;
-
-  if (dayData.length >= 2) {
-    cell.style.background = "linear-gradient(to right, pink 50%, lightgreen 50%)";
-  } else if (dayData.length === 1) {
-    cell.style.background = "pink";
-  } else {
-    cell.style.background = "";
-  }
-
-  console.log(dateKey, dayData);
-}
-
-// --- 日付の情報を復元 ---
-function restoreDayData(dateKey) {
-  const data = selectedData[dateKey] || [];
-
-  // 一旦全削除
-  container.innerHTML = "";
-
-  // データ分だけ生成
-  data.forEach((item, i) => {
-    const newBlock = document.createElement("div");
-    newBlock.className = "time-block";
-    newBlock.innerHTML = `
+        // データ分だけ生成
+        data.forEach((item, i) => {
+          const newBlock = document.createElement("div");
+          newBlock.className = "time-block";
+          newBlock.innerHTML = `
       <button class="remove-btn ${i === 0 ? "hidden" : ""}">削除</button>
-      <div class="block-title">時間帯 ${i+1}</div>
+      <div class="block-title">時間帯 ${i + 1}</div>
       <div class="leave-type">
-        <label><input type="radio" name="leave-type${i + 1}" value="公休" ${item.leaveType === "公休" ? "checked" : ""}>公休</label>
-        <label><input type="radio" name="leave-type${i + 1}"value="有給" ${item.leaveType === "有給" ? "checked" : ""}>有給</label>
+        <label><input type="radio" name="leave-type${i + 1}" value="公休" ${
+            item.leaveType === "公休" ? "checked" : ""
+          }>公休</label>
+        <label><input type="radio" name="leave-type${i + 1}"value="有給" ${
+            item.leaveType === "有給" ? "checked" : ""
+          }>有給</label>
       </div>
       <hr>
       <div class="radio-group">
-        <label><input type="radio" name="type${i+1}" value="split" ${item.mode === "split" ? "checked" : ""}> 区分け</label>
-        <label><input type="radio" name="type${i+1}" value="custom" ${item.mode === "custom" ? "checked" : ""}> カスタム</label>
+        <label><input type="radio" name="type${i + 1}" value="split" ${
+            item.mode === "split" ? "checked" : ""
+          }> 区分け</label>
+        <label><input type="radio" name="type${i + 1}" value="custom" ${
+            item.mode === "custom" ? "checked" : ""
+          }> カスタム</label>
       </div>
       <div class="select-box ${item.mode === "custom" ? "hidden" : ""}">
         <label>時間区分けタイプ</label>
         <select>
           <option class="default" value="">タイプを選択してください</option>
-          <option value="A" ${item.value==="A"?"selected":""}>A : 07:00~16:00</option>
-          <option value="B" ${item.value==="B"?"selected":""}>B : 08:00~17:00</option>
-          <option value="C" ${item.value==="C"?"selected":""}>C : 09:00~18:00</option>
-          <option value="D" ${item.value==="D"?"selected":""}>D : 10:30~19:30</option>
+          <option value="A" ${
+            item.value === "A" ? "selected" : ""
+          }>A : 07:00~16:00</option>
+          <option value="B" ${
+            item.value === "B" ? "selected" : ""
+          }>B : 08:00~17:00</option>
+          <option value="C" ${
+            item.value === "C" ? "selected" : ""
+          }>C : 09:00~18:00</option>
+          <option value="D" ${
+            item.value === "D" ? "selected" : ""
+          }>D : 10:30~19:30</option>
         </select>
       </div>
       <div class="input-box ${item.mode === "split" ? "hidden" : ""}">
         <input type="time" value="${item.start || ""}">
         <input type="time" value="${item.end || ""}">
       </div>`;
-    container.appendChild(newBlock);
-    setupRadioEvents(newBlock);
-    setupRemoveButton(newBlock);
-  });
-
-  // データがないときは時間帯1を作る
-  if (data.length === 0) {
-    addBtn.click();
-    container.querySelector(".remove-btn").classList.add("hidden");
-  }
-}
-
-// 送信情報の整形
-function sendBtn() {
-  const name = document.querySelector("h2").textContent.replace("氏名：", "").trim();
-  const remarks = document.querySelector(".remarks textarea").value.trim();
-
-  const requests = [];
-
-  for (const [dateKey, blocks] of Object.entries(selectedData)) {
-    const d = new Date(dateKey);
-    // 🌟 現在表示中の月のみ送信対象
-    if (d.getFullYear() !== currentYear || d.getMonth() !== currentMonth) continue;
-
-    blocks.forEach(item => {
-      let startTime, endTime;
-
-      if (item.mode === "split") {
-        // 区分けタイプの場合、選択内容から時刻をマッピング
-        const timeMap = {
-          "A": ["07:00", "16:00"],
-          "B": ["08:00", "17:00"],
-          "C": ["09:00", "18:00"],
-          "D": ["10:30", "19:30"]
-        };
-        [startTime, endTime] = timeMap[item.value] || ["", ""];
-      } else {
-        startTime = item.start || "";
-        endTime = item.end || "";
-      }
-
-      if (startTime && endTime) {
-        requests.push({
-          start: `${dateKey.replace(/-/g, "/")} ${startTime}`,
-          end: `${dateKey.replace(/-/g, "/")} ${endTime}`,
-          leaveType: item.leaveType,
-          paidHours: "全時間"
+          container.appendChild(newBlock);
+          setupRadioEvents(newBlock);
+          setupRemoveButton(newBlock);
         });
+
+        // データがないときは時間帯1を作る
+        if (data.length === 0) {
+          addBtn.click();
+          container.querySelector(".remove-btn").classList.add("hidden");
+        }
       }
-    });
-  }
 
-  const sendData = {
-    name,
-    remarks,
-    requests
-  };
+      // 送信情報の整形
+      function sendBtn() {
+        const name = document
+          .querySelector("h2")
+          .textContent.replace("氏名：", "")
+          .trim();
+        const remarks = document
+          .querySelector(".remarks textarea")
+          .value.trim();
 
-  // コンソールに出力
-  console.log(sendData);
+        const requests = [];
 
-  alert("送信データを確認しました（コンソールを見てください）");
-}
-  </script>
-</body>
+        for (const [dateKey, blocks] of Object.entries(selectedData)) {
+          const d = new Date(dateKey);
+          // 🌟 現在表示中の月のみ送信対象
+          if (d.getFullYear() !== currentYear || d.getMonth() !== currentMonth)
+            continue;
+
+          blocks.forEach((item) => {
+            let startTime, endTime;
+
+            if (item.mode === "split") {
+              // 区分けタイプの場合、選択内容から時刻をマッピング
+              const timeMap = {
+                A: ["07:00", "16:00"],
+                B: ["08:00", "17:00"],
+                C: ["09:00", "18:00"],
+                D: ["10:30", "19:30"],
+              };
+              [startTime, endTime] = timeMap[item.value] || ["", ""];
+            } else {
+              startTime = item.start || "";
+              endTime = item.end || "";
+            }
+
+            if (startTime && endTime) {
+              requests.push({
+                start: `${dateKey.replace(/-/g, "/")} ${startTime}`,
+                end: `${dateKey.replace(/-/g, "/")} ${endTime}`,
+                leaveType: item.leaveType,
+                paidHours: "全時間",
+              });
+            }
+          });
+        }
+
+        const sendData = {
+          name,
+          remarks,
+          requests,
+        };
+
+        // コンソールに出力
+        console.log(sendData);
+
+        alert("送信データを確認しました（コンソールを見てください）");
+      }
+    </script>
+  </body>
 </html>
