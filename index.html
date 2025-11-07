@@ -298,10 +298,52 @@ function restoreDayData(dateKey) {
     container.querySelector(".remove-btn").classList.add("hidden");
   }
 }
-        function sendBtn() {
-            alert("送信しました。")
-        }
-        
+
+// 送信情報の整形
+function sendBtn() {
+  const name = document.querySelector("h2").textContent.replace("氏名：", "").trim();
+  const remarks = document.querySelector(".remarks textarea").value.trim();
+
+  const requests = [];
+
+  for (const [dateKey, blocks] of Object.entries(selectedData)) {
+    blocks.forEach(item => {
+      let startTime, endTime;
+
+      if (item.mode === "split") {
+        // 区分けタイプの場合、選択内容から時刻をマッピング
+        const timeMap = {
+          "A": ["07:00", "16:00"],
+          "B": ["08:00", "17:00"],
+          "C": ["09:00", "18:00"],
+          "D": ["10:30", "19:30"]
+        };
+        [startTime, endTime] = timeMap[item.value] || ["", ""];
+      } else {
+        startTime = item.start || "";
+        endTime = item.end || "";
+      }
+
+      if (startTime && endTime) {
+        requests.push({
+          start: `${dateKey.replace(/-/g, "/")} ${startTime}`,
+          end: `${dateKey.replace(/-/g, "/")} ${endTime}`,
+          leaveType: item.leaveType,
+          paidHours: "全時間"
+        });
+      }
+    });
+  }
+
+  const sendData = {
+    name,
+    remarks,
+    requests
+  };
+
+  console.log(sendData);
+  alert("送信データを確認しました（コンソールに出力）");
+}
   </script>
 </body>
 </html>
