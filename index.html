@@ -49,8 +49,12 @@
 
         
         <div class="calendar">
+          <div class="calendar-header">
+            <button id="prevMonth">←</button>
             <h2 id="month-title"></h2>
-            <table id="calendar-body"></table>
+            <button id="nextMonth">→</button>
+          </div>
+          <table id="calendar-body"></table>
         </div>
         
         <div class="remarks">
@@ -131,40 +135,92 @@
             setupRemoveButton(newBlock);
         });
 
-        const calendarBody = document.getElementById("calendar-body");
-        const monthTitle = document.getElementById("month-title");
+    let today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth(); // 0〜11
+    let selectedDateCell = null;
+    let selectedData = {}; // 日付ごとのデータ保存用
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1; // 0=1月
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
+    function renderCalendar(year, month) {
+      const calendar = document.getElementById("calendar-body");
+      const monthLabel = document.getElementById("month-title");
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
 
-        const daysOfWeek = ["日","月","火","水","木","金","土"];
-        monthTitle.textContent = `${month + 1}月`;
+      monthLabel.textContent = `${year}年 ${month + 1}月`;
 
-        // 曜日ヘッダー
-        let headerRow = "<tr>" + daysOfWeek.map(d => `<th>${d}</th>`).join("") + "</tr>";
-        let html = headerRow + "<tr>";
+      let html = "<tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr><tr>";
 
-        // 空白セル
-        for (let i = 0; i < firstDay.getDay(); i++) html += "<td></td>";
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        html += "<td></td>";
+      }
 
-        // 日付セル
-        for (let day = 1; day <= lastDay.getDate(); day++) {
+      for (let day = 1; day <= lastDay.getDate(); day++) {
         const date = new Date(year, month, day);
-        const isToday = day === today.getDate();
-        const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-        html += `<td data-date="${dateKey}" class="${isToday ? "selected" : ""}">${day}</td>`;
+        const dateStr = `${year}-${month + 1}-${day}`;
+
+        // その日にデータが保存されているかをチェック
+        const isFilled = selectedData[dateStr] && selectedData[dateStr].length > 0;
+
+        // データがある日は「filled」クラスを付ける（ピンク表示用）
+        html += `<td class="${isFilled ? "filled" : ""}" data-date="${dateStr}">${day}</td>`;
         if (date.getDay() === 6 && day !== lastDay.getDate()) html += "</tr><tr>";
-        }
+      }
 
-        html += "</tr>";
-        calendarBody.innerHTML = html;
+      html += "</tr>";
+      calendar.innerHTML = html;
 
-        // 登録データ管理
-        const selectedData = {}; //{"2025-11-01":"B"}
-        let selectedDateCell = null;
+      // クリック処理
+      document.querySelectorAll("#calendar td[data-date]").forEach(td => {
+        td.addEventListener("click", () => {
+          if (selectedDateCell) selectedDateCell.classList.remove("selected");
+          td.classList.add("selected");
+          selectedDateCell = td;
+          const clickedDate = td.dataset.date;
+          selectedData[clickedDate] = true;
+          console.log("選択された日付:", clickedDate);
+        });
+      });
+    }
+
+    // ==== ボタンの挙動 ====
+    document.getElementById("prevMonth").addEventListener("click", () => {
+      if (currentMonth === 0) {
+        currentYear--;
+        currentMonth = 11;
+      } else {
+        currentMonth--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+      // 最大2か月先まで（今日の月 +2）
+      const maxMonth = today.getMonth() + 2;
+      const maxYear = today.getFullYear() + (maxMonth > 11 ? 1 : 0);
+      const adjustedMaxMonth = maxMonth % 12;
+
+      if (currentYear > maxYear || (currentYear === maxYear && currentMonth >= adjustedMaxMonth)) {
+        alert("これ以上先の月は表示できません");
+        return;
+      }
+
+      if (currentMonth === 11) {
+        currentYear++;
+        currentMonth = 0;
+      } else {
+        currentMonth++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    // ==== 初期表示（来月をデフォルト表示したい場合）====
+    currentMonth++; 
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    renderCalendar(currentYear, currentMonth);
 
         selectedDateCell = document.querySelector("#calendar-body td.selected");
 
@@ -178,21 +234,21 @@
         const endInput1 = document.getElementById("endTime");
 
         // 情報登録
-        
-calendarBody.addEventListener("click", e => {
-  if (e.target.tagName !== "TD" || !e.target.dataset.date) return;
+        const calendarBody = document.getElementById("calendar-body");
+      calendarBody.addEventListener("click", e => {
+        if (e.target.tagName !== "TD" || !e.target.dataset.date) return;
 
-  // --- 旧日付を保存 ---
-  if (selectedDateCell) saveDayData(selectedDateCell.dataset.date);
+        // --- 旧日付を保存 ---
+        if (selectedDateCell) saveDayData(selectedDateCell.dataset.date);
 
-  // --- 選択状態を変更 ---
-  document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
-  e.target.classList.add("selected");
-  selectedDateCell = e.target;
+        // --- 選択状態を変更 ---
+        document.querySelectorAll("#calendar-body td").forEach(td => td.classList.remove("selected"));
+        e.target.classList.add("selected");
+        selectedDateCell = e.target;
 
-  // ---  新しい日付のデータを復元 ---
-  restoreDayData(selectedDateCell.dataset.date);
-});
+        // ---  新しい日付のデータを復元 ---
+        restoreDayData(selectedDateCell.dataset.date);
+      });
 
 // --- 日付の情報を保存 ---
 function saveDayData(dateKey) {
@@ -307,6 +363,10 @@ function sendBtn() {
   const requests = [];
 
   for (const [dateKey, blocks] of Object.entries(selectedData)) {
+    const d = new Date(dateKey);
+    // 🌟 現在表示中の月のみ送信対象
+    if (d.getFullYear() !== currentYear || d.getMonth() !== currentMonth) continue;
+
     blocks.forEach(item => {
       let startTime, endTime;
 
@@ -341,8 +401,10 @@ function sendBtn() {
     requests
   };
 
+  // コンソールに出力
   console.log(sendData);
-  alert("送信データを確認しました（コンソールに出力）");
+
+  alert("送信データを確認しました（コンソールを見てください）");
 }
   </script>
 </body>
