@@ -185,14 +185,22 @@
 
     // ==== ボタンの挙動 ====
     document.getElementById("prevMonth").addEventListener("click", () => {
-      if (currentMonth === 0) {
-        currentYear--;
-        currentMonth = 11;
-      } else {
-        currentMonth--;
-      }
-      renderCalendar(currentYear, currentMonth);
-    });
+    // 今月より前には戻れないように制限
+    if (currentYear < today.getFullYear() || 
+      (currentYear === today.getFullYear() && currentMonth <= today.getMonth())) {
+      alert("これ以上前の月は表示できません");
+      return;
+    }
+
+    if (currentMonth === 0) {
+      currentYear--;
+      currentMonth = 11;
+    } else {
+      currentMonth--;
+    }
+
+    renderCalendar(currentYear, currentMonth);
+  });
 
     document.getElementById("nextMonth").addEventListener("click", () => {
       // 最大2か月先まで（今日の月 +2）
