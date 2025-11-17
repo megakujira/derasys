@@ -671,7 +671,7 @@
 
         for (const [dateKey, blocks] of Object.entries(selectedData)) {
           const d = new Date(dateKey);
-          // 🌟 現在表示中の月のみ送信対象
+          //  現在表示中の月のみ送信対象
           if (d.getFullYear() !== currentYear || d.getMonth() !== currentMonth)
             continue;
 
@@ -709,8 +709,26 @@
           requests,
         };
 
-        // コンソールに出力
-        console.log(sendData);
+        /**
+         * GASへのデータ送信が成功した後に実行されるコールバック関数
+         * @param {string} response - GASから返されたメッセージ
+         */
+        function onSuccess(response) {
+            alert(response); // サーバーからのメッセージを表示
+            
+        }
+
+
+        /**
+         * GASへのデータ送信が失敗した後に実行されるコールバック関数
+         * @param {Error} error - エラーオブジェクト
+         */
+        function onFailure(error) {
+            alert('エラーが発生しました: ' + error.message); // エラーメッセージを表示
+        }
+
+        google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure)
+        .processFormData(sendData);
 
         alert("送信データを確認しました（コンソールを見てください）");
       }
